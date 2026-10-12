@@ -1,0 +1,42 @@
+name: hadoop-hdfs-yarn-architecture
+
+services:
+
+  hadoop_lab:
+    container_name: 'HadoopLab'
+    hostname: lab
+    networks:
+      default:
+        ipv4_address: 172.30.0.40
+    extra_hosts:
+      - "zk1:172.30.0.11"
+      - "zk2:172.30.0.12"
+      - "zk3:172.30.0.13"
+      - "nn1:172.30.0.21"
+      - "nn2:172.30.0.22"
+      - "worker1:172.30.0.31"
+      - "worker2:172.30.0.32"
+      - "worker3:172.30.0.33"
+    build:
+      context: ..
+      dockerfile: .docker/Dockerfile
+      target: img-lab
+    volumes:
+      - ..:/app
+      - ./hadoop:/hadoop:ro
+      - hadoop-admin:/hadoop-admin                      # para editar dfs.exclude (lección 04)
+      - nn1-data:/mnt/nn1:ro                            # metadatos de nn1, solo lectura (lección 02)
+      - hadoop-bashhistory:/commandhistory
+    env_file:
+      - ../.envs/lab.env
+    ports:
+      - 8891:8891   # JupyterLab
+    working_dir: /app
+    restart: unless-stopped
+    command:
+      - /bin/sh
+      - -c
+      - sleep infinity
+
+volumes:
+  hadoop-bashhistory:

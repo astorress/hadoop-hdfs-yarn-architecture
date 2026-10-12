@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Configuración común a HDFS, YARN, MapReduce y a los clientes. -->
+<configuration>
+  <!-- El sistema de archivos es el nameservice "lake", no un host: el cliente busca solo al NameNode activo -->
+  <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://lake</value>
+  </property>
+  <property>
+    <name>hadoop.tmp.dir</name>
+    <value>/data/tmp</value>
+  </property>
+  <!-- ZooKeeper: elección del NameNode y del ResourceManager activos -->
+  <property>
+    <name>ha.zookeeper.quorum</name>
+    <value>zk1:2181,zk2:2181,zk3:2181</value>
+  </property>
+  <property>
+    <name>hadoop.zk.address</name>
+    <value>zk1:2181,zk2:2181,zk3:2181</value>
+  </property>
+  <!-- Papelera: un archivo borrado vive 60 minutos en /user/<usuario>/.Trash antes de borrarse de verdad -->
+  <property>
+    <name>fs.trash.interval</name>
+    <value>60</value>
+  </property>
+  <!-- Rack awareness: un script dice en qué rack está cada DataNode -->
+  <property>
+    <name>net.topology.script.file.name</name>
+    <value>/hadoop/topology.sh</value>
+  </property>
+  <property>
+    <name>hadoop.http.staticuser.user</name>
+    <value>hadoop</value>
+  </property>
+</configuration>

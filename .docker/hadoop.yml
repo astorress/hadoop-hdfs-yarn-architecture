@@ -1,0 +1,159 @@
+# Clúster Hadoop con alta disponibilidad.
+#   zk1-zk3  ZooKeeper: guarda qué NameNode y qué ResourceManager están activos
+#   nn1      NameNode + ZKFC + JournalNode + ResourceManager (rm1)
+#   nn2      NameNode + ZKFC + JournalNode + ResourceManager (rm2) + JobHistory
+#   worker1  DataNode + NodeManager + JournalNode (rack-a)
+#   worker2  DataNode + NodeManager (rack-a)
+#   worker3  DataNode + NodeManager (rack-b)
+# Interfaces web en el host: NameNodes 9870/9871, ResourceManagers 8088/8089, JobHistory 19888.
+
+# Cada nodo tiene una IP fija y todos conocen los nombres de todos (/etc/hosts). Así un nombre sigue resolviendo
+# aunque su contenedor esté apagado, como en un clúster real con DNS fijo: sin esto, apagar nn1 haría que nn2 ni
+# siquiera pudiera construir la lista de JournalNodes.
+x-hosts: &hosts
+  extra_hosts:
+    - "zk1:172.30.0.11"
+    - "zk2:172.30.0.12"
+    - "zk3:172.30.0.13"
+    - "nn1:172.30.0.21"
+    - "nn2:172.30.0.22"
+    - "worker1:172.30.0.31"
+    - "worker2:172.30.0.32"
+    - "worker3:172.30.0.33"
+    - "lab:172.30.0.40"
+
+x-hadoop: &hadoop
+  image: hadoop-hdfs-yarn-architecture-hadoop
+  build:
+    context: ..
+    dockerfile: .docker/Dockerfile
+    target: img-base
+  restart: unless-stopped
+  entrypoint: ["bash", "/hadoop/node.sh"]
+  <<: *hosts
+
+x-zookeeper: &zookeeper
+  image: zookeeper:3.9.6
+  restart: unless-stopped
+  <<: *hosts
+
+services:
+
+  zk1:
+    <<: *zookeeper
+    networks:
+      default:
+        ipv4_address: 172.30.0.11
+    container_name: 'HadoopZk1'
+    hostname: zk1
+    environment: &zk-env
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zk1:2888:3888;2181 server.2=zk2:2888:3888;2181 server.3=zk3:2888:3888;2181
+      JVMFLAGS: -Xmx64m
+      ZOO_4LW_COMMANDS_WHITELIST: srvr,stat,mntr,ruok
+  zk2:
+    <<: *zookeeper
+    networks:
+      default:
+        ipv4_address: 172.30.0.12
+    container_name: 'HadoopZk2'
+    hostname: zk2
+    environment:
+      <<: *zk-env
+      ZOO_MY_ID: 2
+  zk3:
+    <<: *zookeeper
+    networks:
+      default:
+        ipv4_address: 172.30.0.13
+    container_name: 'HadoopZk3'
+    hostname: zk3
+    environment:
+      <<: *zk-env
+      ZOO_MY_ID: 3
+
+  nn1:
+    <<: *hadoop
+    networks:
+      default:
+        ipv4_address: 172.30.0.21
+    container_name: 'HadoopNameNode1'
+    hostname: nn1
+    environment:
+      DAEMONS: journalnode namenode zkfc resourcemanager
+    ports:
+      - 9870:9870     # NameNode nn1
+      - 8088:8088     # ResourceManager rm1
+    volumes:
+      - ./hadoop:/hadoop:ro
+      - hadoop-admin:/hadoop-admin
+      - nn1-data:/data
+    depends_on: [zk1, zk2, zk3]
+  nn2:
+    <<: *hadoop
+    networks:
+      default:
+        ipv4_address: 172.30.0.22
+    container_name: 'HadoopNameNode2'
+    hostname: nn2
+    environment:
+      DAEMONS: journalnode namenode zkfc resourcemanager historyserver
+    ports:
+      - 9871:9870     # NameNode nn2
+      - 8089:8088     # ResourceManager rm2
+      - 19888:19888   # JobHistory
+    volumes:
+      - ./hadoop:/hadoop:ro
+      - hadoop-admin:/hadoop-admin
+      - nn2-data:/data
+    depends_on: [zk1, zk2, zk3]
+  worker1:
+    <<: *hadoop
+    networks:
+      default:
+        ipv4_address: 172.30.0.31
+    container_name: 'HadoopWorker1'
+    hostname: worker1
+    environment:
+      DAEMONS: journalnode datanode nodemanager
+    volumes:
+      - ./hadoop:/hadoop:ro
+      - worker1-data:/data
+  worker2:
+    <<: *hadoop
+    networks:
+      default:
+        ipv4_address: 172.30.0.32
+    container_name: 'HadoopWorker2'
+    hostname: worker2
+    environment:
+      DAEMONS: datanode nodemanager
+    volumes:
+      - ./hadoop:/hadoop:ro
+      - worker2-data:/data
+  worker3:
+    <<: *hadoop
+    networks:
+      default:
+        ipv4_address: 172.30.0.33
+    container_name: 'HadoopWorker3'
+    hostname: worker3
+    environment:
+      DAEMONS: datanode nodemanager
+    volumes:
+      - ./hadoop:/hadoop:ro
+      - worker3-data:/data
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+
+volumes:
+  hadoop-admin:   # dfs.exclude: compartido entre el laboratorio y los NameNodes (decommission)
+  nn1-data:
+  nn2-data:
+  worker1-data:
+  worker2-data:
+  worker3-data:

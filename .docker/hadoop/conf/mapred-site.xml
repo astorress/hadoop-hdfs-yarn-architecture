@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- MapReduce sobre YARN: el ApplicationMaster y cada tarea son contenedores. -->
+<configuration>
+  <property>
+    <name>mapreduce.framework.name</name>
+    <value>yarn</value>
+  </property>
+  <property>
+    <name>yarn.app.mapreduce.am.env</name>
+    <value>HADOOP_MAPRED_HOME=/opt/hadoop</value>
+  </property>
+  <property>
+    <name>mapreduce.map.env</name>
+    <value>HADOOP_MAPRED_HOME=/opt/hadoop</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.env</name>
+    <value>HADOOP_MAPRED_HOME=/opt/hadoop</value>
+  </property>
+  <property>
+    <name>yarn.app.mapreduce.am.resource.mb</name>
+    <value>512</value>
+  </property>
+  <property>
+    <name>yarn.app.mapreduce.am.command-opts</name>
+    <value>-Xmx384m</value>
+  </property>
+  <property>
+    <name>mapreduce.map.memory.mb</name>
+    <value>384</value>
+  </property>
+  <property>
+    <name>mapreduce.map.java.opts</name>
+    <value>-Xmx256m</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.memory.mb</name>
+    <value>384</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.java.opts</name>
+    <value>-Xmx256m</value>
+  </property>
+  <property>
+    <name>mapreduce.task.io.sort.mb</name>
+    <value>64</value>
+  </property>
+  <!-- JobHistory en nn2: guarda los contadores y tareas de cada trabajo terminado -->
+  <property>
+    <name>mapreduce.jobhistory.address</name>
+    <value>nn2:10020</value>
+  </property>
+  <property>
+    <name>mapreduce.jobhistory.webapp.address</name>
+    <value>nn2:19888</value>
+  </property>
+  <property>
+    <name>mapreduce.jobhistory.bind-host</name>
+    <value>0.0.0.0</value>
+  </property>
+</configuration>

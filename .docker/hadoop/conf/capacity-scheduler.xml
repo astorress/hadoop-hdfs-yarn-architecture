@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Capacity Scheduler: dos colas. prod tiene garantizado el 70 % del clúster y dev el 30 %, pero cada una puede
+     tomar prestado lo que la otra no usa. Si prod lo necesita de vuelta, la preemption se lo quita a dev. -->
+<configuration>
+  <property>
+    <name>yarn.scheduler.capacity.root.queues</name>
+    <value>prod,dev</value>
+  </property>
+  <property>
+    <name>yarn.scheduler.capacity.root.prod.capacity</name>
+    <value>70</value>
+  </property>
+  <property>
+    <name>yarn.scheduler.capacity.root.prod.maximum-capacity</name>
+    <value>100</value>
+  </property>
+  <property>
+    <name>yarn.scheduler.capacity.root.prod.user-limit-factor</name>
+    <value>2</value>
+  </property>
+  <property>
+    <name>yarn.scheduler.capacity.root.dev.capacity</name>
+    <value>30</value>
+  </property>
+  <property>
+    <name>yarn.scheduler.capacity.root.dev.maximum-capacity</name>
+    <value>100</value>
+  </property>
+  <!-- Un usuario puede crecer hasta 4 veces la capacidad de la cola si el resto está libre -->
+  <property>
+    <name>yarn.scheduler.capacity.root.dev.user-limit-factor</name>
+    <value>4</value>
+  </property>
+  <!-- Los trabajos sin cola van a dev -->
+  <property>
+    <name>yarn.scheduler.capacity.queue-mappings</name>
+    <value>u:%user:dev</value>
+  </property>
+  <property>
+    <name>yarn.scheduler.capacity.queue-mappings-override.enable</name>
+    <value>false</value>
+  </property>
+  <property>
+    <name>yarn.scheduler.capacity.maximum-am-resource-percent</name>
+    <value>0.5</value>
+  </property>
+  <property>
+    <name>yarn.scheduler.capacity.resource-calculator</name>
+    <value>org.apache.hadoop.yarn.util.resource.DefaultResourceCalculator</value>
+  </property>
+</configuration>
