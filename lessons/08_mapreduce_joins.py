@@ -5,7 +5,7 @@
 #                     Funciona con tablas de cualquier tamaño, pero baraja todo por la red.
 #   map-side join     la tabla pequeña viaja a cada map por la caché distribuida y la unión se hace en el map.
 #                     Casi no hay shuffle, pero la tabla pequeña debe caber en la memoria de cada map.
-# Es lo mismo que en Spark son el sort-merge join y el broadcast join.
+# En los motores SQL distribuidos estas estrategias se llaman sort-merge join y broadcast join.
 from collections import defaultdict
 
 from lab.config import RAW, WORK

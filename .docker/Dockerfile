@@ -8,7 +8,6 @@ FROM --platform=linux/amd64 apache/hadoop:3.5.0 AS hadoop
 # mappers y reducers de Hadoop Streaming (lecciones 07-09) son scripts de Python que corren en los NodeManagers.
 FROM python:3.13-slim-trixie AS img-base
 
-# Arguments
 ARG USER=hadoop
 ARG USER_HOME=/home/$USER
 ARG VOLUME=/app
@@ -18,7 +17,6 @@ RUN pip3 install --upgrade pip
 
 RUN apt-get update
 
-# Inital OS configuration
 RUN apt-get install -y locales \
     && sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen \
     && locale-gen

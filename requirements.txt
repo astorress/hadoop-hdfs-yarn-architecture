@@ -4,4 +4,3 @@ pandas==2.3.3
 # notebooks/sandbox.ipynb
 jupyterlab==4.6.4
 ipykernel==7.4.0
-matplotlib==3.11.2

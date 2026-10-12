@@ -4,6 +4,3 @@
 .vscode
 .pytest_cache
 .ipynb_checkpoints
-spark-warehouse
-metastore_db
-derby.log

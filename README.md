@@ -4,8 +4,8 @@ Laboratorio para entender **Hadoop distribuido**: almacenamiento con HDFS, alta 
 JournalNodes, elección automática con ZooKeeper, ejecución de trabajos con YARN y MapReduce, tolerancia a fallos,
 topología de racks y herramientas para operar datos a escala.
 
-El caso común son 1.000 medidores inteligentes de una distribuidora colombiana: 30 días de lecturas, catálogo,
-clima e inspecciones. Los mismos datos sintéticos aparecen en los laboratorios de Kafka y Spark.
+El caso de estudio son 1.000 medidores inteligentes de una distribuidora colombiana: 30 días de lecturas, catálogo,
+clima e inspecciones.
 
 ## Arquitectura
 

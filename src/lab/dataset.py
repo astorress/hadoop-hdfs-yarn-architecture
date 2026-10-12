@@ -6,9 +6,9 @@
 #   inspections  resultado de 300 visitas de campo hechas en octubre (fraude, medidor dañado o normal)
 #
 # Todo sale de una semilla fija: cada ejecución genera exactamente los mismos datos. Por eso las lecciones pueden
-# comparar los resultados de un modelo con la verdad (FRAUD, STUCK), algo que en la vida real no se conoce.
+# comparar lo que detectan con la verdad (FRAUD, STUCK), algo que en la vida real no se conoce.
 import random
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 
 import numpy as np
 
@@ -17,8 +17,6 @@ METERS = 1000
 START = date(2026, 9, 1)
 DAYS = 30
 SLOTS = 96  # lecturas de 15 minutos por día
-TZ = timezone(timedelta(hours=-5),
-              "America/Bogota")  # hora local de las lecturas (Colombia no tiene horario de verano)
 
 # ciudad: (código, peso, temperatura media, amplitud diaria)
 CITIES = {
@@ -207,8 +205,3 @@ def inspections():
     rng.shuffle(rows)
     return [(m, (date(2026, 10, 1) + timedelta(days=rng.randint(0, 9))).isoformat(), result)
             for m, result in rows]
-
-
-def epoch_ms(ts):
-    """'2026-09-30 18:00:00' (hora de Colombia) -> milisegundos desde 1970 (epoch)."""
-    return int(datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").replace(tzinfo=TZ).timestamp() * 1000)
